@@ -4,6 +4,24 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 import Timer from './TimerComponent'
 
+const exercise = {
+    FLAT_PLANK: {
+      name: 'Flat Plank',
+      duration: 55
+    },
+    LEFT_PLANK: {
+      name: 'Left Plank',
+      duration: 35
+    },
+    RIGHT_PLANK: {
+      name: 'Right Plank',
+      duration: 35
+    },
+    WALL_SIT: {
+      name: 'Wall Sit',
+      duration: 55
+    }
+}
 
 export default class TimerScene extends Component { 
 
@@ -11,12 +29,13 @@ export default class TimerScene extends Component {
     super();
     this.state = {
       running: false,
+      exercise: exercise.FLAT_PLANK,
 
       interval: null,
+      alarm: null,
       elapsed: 0,
-      duration: 60,
+      duration: exercise.FLAT_PLANK.duration,
 
-      exerciseName: 'Flat Plank',
       toggleTitle: 'Plank'
     };
   }
@@ -25,7 +44,7 @@ export default class TimerScene extends Component {
     return ( 
       <View style={styles.container}>
 
-        <Text style={styles.exercise}>{this.state.exerciseName}</Text>
+        <Text style={styles.exercise}>{this.state.exercise.name}</Text>
 
         <Timer 
             elapsed={this.state.elapsed}
@@ -45,24 +64,61 @@ export default class TimerScene extends Component {
   componentDidUpdate(previousProps, previousState) {
     if (previousState.running != this.state.running) {
       if (this.state.running) {
-        this._startTimer();
+        this._startUpdates();
+        this._startTimer()
+        this.setState({ toggleTitle: 'Flop' });
       } else {
-        clearInterval(this.state.interval);
+        this._endUpdates();
+        this._endTimer();
         this.setState({ toggleTitle: 'Plank' });
       }
     }
   }
 
-  _startTimer() {
+  _startUpdates() {
     const interval = setInterval(() => {
-        const lastTime = this.state.elapsed % this.state.duration;
+        const lastTime = this.state.elapsed;
         this.setState({ elapsed: lastTime + 1 });
     }, 1000);
 
-    this.setState({ 
-        toggleTitle: 'Flop',
-        interval: interval
-    });
+    this.setState({ interval: interval });
+  }
+
+  _endUpdates() {
+    clearInterval(this.state.interval);
+  }
+
+  _startTimer() {
+    const remainingSeconds = this.state.duration - this.state.elapsed;
+    const alarm = setTimeout(() => {
+      let nextExercise;
+      switch (this.state.exercise.name) {
+        case exercise.FLAT_PLANK.name:
+          nextExercise = exercise.LEFT_PLANK;
+          break;
+        case exercise.LEFT_PLANK.name:
+          nextExercise = exercise.RIGHT_PLANK;
+          break;
+        case exercise.RIGHT_PLANK.name:
+          nextExercise = exercise.WALL_SIT;
+          break;
+        case exercise.WALL_SIT.name:
+          nextExercise = exercise.FLAT_PLANK;
+          break;
+      }
+      
+      this.setState({ 
+        elapsed: 0,
+        duration: nextExercise.duration,
+        exercise: nextExercise,
+        running: false
+      });
+    }, remainingSeconds * 1000);
+    this.setState({ alarm: alarm });
+  }
+
+  _endTimer() {
+    clearTimeout(this.state.alarm);
   }
 }
 

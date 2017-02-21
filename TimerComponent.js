@@ -27,7 +27,7 @@ export default class Timer extends Component {
         {
           (fill) => (
             <Text style={styles.timeText}>
-              { Math.round(this.props.elapsed) }
+              { Math.round(this.props.duration - this.props.elapsed) }
             </Text>
           )
         }
