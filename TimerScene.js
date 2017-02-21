@@ -16,6 +16,7 @@ export default class TimerScene extends Component {
       elapsed: 0,
       duration: 60,
 
+      exerciseName: 'Flat Plank',
       toggleTitle: 'Plank'
     };
   }
@@ -23,6 +24,8 @@ export default class TimerScene extends Component {
   render() { 
     return ( 
       <View style={styles.container}>
+
+        <Text style={styles.exercise}>{this.state.exerciseName}</Text>
 
         <Timer 
             elapsed={this.state.elapsed}
@@ -71,5 +74,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#152d44',
     padding: 50
+  },
+  exercise: {
+    backgroundColor: 'transparent',
+    textAlign: 'center',
+    bottom: 20,
+    color: '#FFFFFF',
+    fontSize: 65,
+    fontWeight: "100"
   }
 });
